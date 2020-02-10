@@ -1,0 +1,39 @@
+set xlabel "Patch Size"
+set ylabel "P.F."
+set terminal png
+set output "PF_plots.png"
+plot "Output_L.datgnuplot" using 1:2 title "Large" with points,\
+"Output_S.datgnuplot" using 1:2 title "Small" with points,\
+"Output_M.datgnuplot" using 1:2 title "Medium" with points,\
+"Output_XL.datgnuplot" using 1:2 title "Extra Large" with points
+set terminal png
+set ylabel "Number of patches"
+set output "Number_patches.png"
+plot "Output_L.datgnuplot" using 1:3 title "Large" with points,\
+"Output_S.datgnuplot" using 1:3 title "Small" with points,\
+"Output_M.datgnuplot" using 1:3 title "Medium" with points,\
+"Output_XL.datgnuplot" using 1:3 title "Extra Large" with points
+set ylabel "P.F."
+set xlabel "Patch Size"
+set output "PF_plots_line.png"
+plot "Output_L.datgnuplot" using 1:2 title "Large" with linespoints,\
+"Output_S.datgnuplot" using 1:2 title "Small" with linespoints,\
+"Output_M.datgnuplot" using 1:2 title "Medium" with linespoints,\
+"Output_XL.datgnuplot" using 1:2 title "Extra Large" with linespoints
+set ylabel "Number of patches"
+set output "Number_patches_lines.png"
+plot "Output_L.datgnuplot" using 1:3 title "Large" with linespoints,\
+"Output_S.datgnuplot" using 1:3 title "Small" with linespoints,\
+"Output_M.datgnuplot" using 1:3 title "Medium" with linespoints,\
+"Output_XL.datgnuplot" using 1:3 title "Extra Large" with linespoints
+set terminal png
+set output "zoomed_number_patches.png"
+plot "Output_L.datgnuplot" every ::2::8 using 1:3 title "Large" with points,\
+"Output_S.datgnuplot" using 1:3 every ::2::8 title "Small" with points,\
+"Output_M.datgnuplot" using 1:3 every ::2::8 title "Medium" with points,\
+"Output_XL.datgnuplot" using 1:3 every ::2::8 title "Extra Large" with points
+set output "Average_pf.png"
+set ylabel "Average PF"
+plot "average_pf.datgnuplot" title "Averaged PF of all sizes" with points
+set output "Average_pf_line.png"
+plot "average_pf.datgnuplot" title "Averaged PF of all sizes" with linespoints
