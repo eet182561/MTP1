@@ -37,3 +37,5 @@ set ylabel "Average PF"
 plot "average_pf.datgnuplot" title "Averaged PF of all sizes" with points
 set output "Average_pf_line.png"
 plot "average_pf.datgnuplot" title "Averaged PF of all sizes" with linespoints
+set output "Error_plot.png"
+plot "average_pf.datgnuplot" using 1:2:3 title "Average PF with Variance"  with yerrorbars

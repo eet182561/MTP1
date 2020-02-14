@@ -62,18 +62,18 @@ model generate(const string Size){
     if(Size=="S"){
         scale_x = 1; scale_y=1;
     }else if(Size=="M"){
-        scale_x = 1.01;
-        scale_y = 1.01;
+        scale_x = 1.1;
+        scale_y = 1.0333;
     }else if(Size=="L"){
-        scale_x = 1.02;
-        scale_y = 1.02;
+        scale_x = 1.2;
+        scale_y = 1.07;
     }else{
-        scale_x = 1.03;
-        scale_y = 1.03;
+        scale_x = 1.3;
+        scale_y = 1.1;
         //Size == XL
     }
     return model{
-            {l_t*scale_y,b_t*scale_y},
+            {l_t*scale_y,b_t*scale_x},
             {l_s*scale_y,b_s*scale_x},
             {a_a*scale_y,b_a*scale_y,h_a*scale_x}
     };
@@ -155,21 +155,24 @@ fit_rval fit(model shirt,patch p){
     return {tot_area/area_shirt,tot_area,area_shirt};
 }
 
-void display_results(vector<vector<double>> pfs,vector<string> sizes){
+void display_results(vector<vector<fit_rval>> pfs,vector<string> sizes){
     for(int i=0;i<4;i++){
         cout<<"****** "<<sizes[i]<<" **********"<<endl;
         cout<<"patch_size\tpf"<<endl;
         for(int k=0;k<20;k++){
-            cout<<(k+1)/2.0<<"\t\t\t"<<pfs[i][k]<<endl;
+            cout<<(k+1)/2.0<<"\t\t\t"<<pfs[i][k].pf<<endl;
         }
         cout<<endl;
     }
 }
-void print_result(vector<vector<double>> pfs,vector<string> sizes){
+
+vector<double> dist_sizes = {0.08,0.32,0.35,0.25}; //Approx Probability distribution of sizes, Using world size chart distribution
+
+void print_result(vector<vector<fit_rval>> pfs,vector<string> sizes){
     ofstream fout;
 
     for(int i=0;i<4;i++){
-        fout.open("Output_"+sizes[i]+".dat");
+        fout.open("Output_"+sizes[i]+".datgnuplot");
         model a = generate(sizes[i]);
         fout<<"#The dimension of the shirt "<<sizes[i]<<" are:"<<endl;
         fout<<"#Torso:\t"<<a.t.l<<" x "<<a.t.b<<endl;
@@ -177,25 +180,38 @@ void print_result(vector<vector<double>> pfs,vector<string> sizes){
         fout<<"#Shoul:\t"<<a.s.l<<" x "<<a.s.b<<endl;
         fout<<endl;
         fout<<"#****** "<<sizes[i]<<" **********"<<endl;
-        fout<<"#patch_size\tpf"<<endl;
+        fout<<"#patch_size\tpf\tNo.Patches"<<endl;
         for(int k=0;k<20;k++){
-            fout<<(k+1)/2.0<<"\t\t\t"<<pfs[i][k]<<endl;
+            fout<<(k+1)/2.0<<"\t"<<pfs[i][k].pf<<"\t"<<pfs[i][k].area/((k+1)/2.0)/((k+1)/2.0)<<endl;
         }
         fout<<endl;
         fout.close();
     }
+    fout.open("average_pf.datgnuplot");
+    for(int k=0;k<20;k++){
+        fout<<(k+1)/2.0<<"\t";
+        double sum=0;
+        double square_sum = 0;
+        for(int i=0;i<4;i++){
+            sum+=pfs[i][k].pf*dist_sizes[i];
+            square_sum+=(pfs[i][k].pf*pfs[i][k].pf)*dist_sizes[i];
+        }
+        fout<<sum<<"\t"<<(square_sum-sum*sum)<<endl;
+    }
+    fout.close();
 
 }
 int main() {
     std::cout << "Hello, World!" << std::endl;
     vector<string> sizes = {"S","M","L","XL"};
-    vector<vector<double>> pfs;
+
+    vector<vector<fit_rval>> pfs;
     for (const auto s:sizes){
-        vector<double> temp;
+        vector<fit_rval> temp;
         model ss = generate(s);
         for(double i=0.5;i<=10; i+=0.5){
             patch p{i};
-            temp.push_back(fit(ss,p).pf);
+            temp.push_back(fit(ss,p));
         }
         pfs.push_back(temp);
     }
